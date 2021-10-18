@@ -15,6 +15,6 @@ resource "random_string" "suffix" {
 }
 
 locals {
-  cluster_name        = "versentsg-ekslab-${random_string.suffix.result}"
+  cluster_name        = "eks-${random_string.suffix.result}"
   availability_zone   = ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]
 }
