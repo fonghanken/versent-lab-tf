@@ -17,4 +17,6 @@ resource "random_string" "suffix" {
 locals {
   cluster_name        = "eks-${random_string.suffix.result}"
   availability_zone   = ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]
+  work_node1_size    = 1
+  work_node2_size    = 0
 }
