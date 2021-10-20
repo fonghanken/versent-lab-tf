@@ -2,7 +2,7 @@ module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = local.cluster_name
   cluster_version = "1.20"
-  subnets         = module.vpc.private_subnets
+  subnets         = data.aws_subnet_ids.private.ids
 
   tags = {
     Environment = "training"
@@ -10,30 +10,105 @@ module "eks" {
     GithubOrg   = "terraform-aws-modules"
   }
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = data.aws_vpc.versent_lab.id
 
-  workers_group_defaults = {
-    root_volume_type = "gp2"
+  # workers_group_defaults = {
+  #   root_volume_type = "gp2"
+  # }
+
+  # worker_groups = [
+  #   {
+  #     name                          = "infra-node-1"
+  #     instance_type                 = "t2.small"
+  #     additional_userdata           = "Infra Node 1"
+  #     asg_desired_capacity          = local.infra_node_size
+  #     additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
+  #     #suspended_processes           = ["AZRebalance","Launch","Terminated"]
+  #     tags = [{
+  #       key                 = "node.kubernetes.io/role=infra"
+  #       value               = "owned"
+  #       propagate_at_launch = true
+  #     }]
+  #   },
+  #   {
+  #     name                          = "worker-node-2"
+  #     instance_type                 = "t2.small"
+  #     additional_userdata           = "Worker node 2"
+  #     additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
+  #     asg_desired_capacity          = local.work_node_size
+  #     #suspended_processes           = ["AZRebalance","Launch","Terminated"]
+  #     tags = [{
+  #       key                 = "node.kubernetes.io/role=worker"
+  #       value               = "true"
+  #       propagate_at_launch = true
+  #     }]
+  #   },
+  # ]
+
+  #Managed Node Groups
+  node_groups_defaults = {
+    #ami_type  = "AL2_x86_64"
+    disk_size = 30
   }
 
-  worker_groups = [
-    {
-      name                          = "worker-node-1"
-      instance_type                 = "t2.small"
-      additional_userdata           = "Worker node 1"
-      asg_desired_capacity          = local.work_node1_size
-      additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
-      #suspended_processes           = ["AZRebalance","Launch","Terminated"]
+  node_groups = {
+    infra = {
+      desired_capacity = local.infra_node_size
+      max_capacity     = 3
+      min_capacity     = 1
+
+      instance_types = ["t2.small"]
+      capacity_type  = "ON_DEMAND"
+      k8s_labels = {
+        Environment = "testing"
+        GithubRepo  = "terraform-aws-eks"
+        GithubOrg   = "terraform-aws-modules"
+        role        = "infra"
+      }
+      launch_template_id  = aws_launch_template.infra.id
+      worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
     },
-    {
-      name                          = "worker-node-2"
-      instance_type                 = "t2.small"
-      additional_userdata           = "Worker node 2"
-      additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
-      asg_desired_capacity          = local.work_node2_size
-      #suspended_processes           = ["AZRebalance","Launch","Terminated"]
-    },
-  ]
+    worker = {
+      desired_capacity = local.work_node_size
+      max_capacity     = 3
+      min_capacity     = 1
+
+      instance_types = ["t2.small"]
+      capacity_type  = "ON_DEMAND"
+      k8s_labels = {
+        Environment = "testing"
+        GithubRepo  = "terraform-aws-eks"
+        GithubOrg   = "terraform-aws-modules"
+        role        = "worker"
+      }
+      launch_template_id  = aws_launch_template.worker.id
+      worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
+    }
+  }
+}
+
+resource "aws_launch_template" "infra" {
+  name                          = "infra_launch_template"
+  update_default_version        = false
+
+  tag_specifications {
+    resource_type               = "instance"
+    tags = {
+      Name                      = "${local.cluster_name}-infra"
+    }   
+  }
+}
+
+resource "aws_launch_template" "worker" {
+  name                          = "worker_launch_template"
+  update_default_version        = false
+
+  tag_specifications {
+    resource_type               = "instance"
+    tags = {
+      Name                      = "${local.cluster_name}-worker"
+    }   
+  }
 }
 
 data "aws_eks_cluster" "cluster" {

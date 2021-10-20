@@ -32,3 +32,7 @@ output "cluster_name" {
   description = "Kubernetes Cluster Name"
   value       = local.cluster_name
 }
+
+output "subnet_cidr_blocks" {
+  value = [for s in data.aws_subnet.example : s.cidr_block]
+}
