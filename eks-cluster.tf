@@ -88,7 +88,7 @@ module "eks" {
 }
 
 resource "aws_launch_template" "infra" {
-  name                          = "infra_launch_template"
+  name                          = "${local.cluster_name}-infra_launch_template"
   update_default_version        = false
 
   tag_specifications {
@@ -100,7 +100,7 @@ resource "aws_launch_template" "infra" {
 }
 
 resource "aws_launch_template" "worker" {
-  name                          = "worker_launch_template"
+  name                          = "${local.cluster_name}-worker_launch_template"
   update_default_version        = false
 
   tag_specifications {
