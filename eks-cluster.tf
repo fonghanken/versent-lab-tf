@@ -23,6 +23,7 @@ module "eks" {
       additional_userdata           = "Worker node 1"
       asg_desired_capacity          = local.work_node1_size
       additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
+      suspended_processes           = ["AZRebalance","Launch","Terminated"]
     },
     {
       name                          = "worker-node-2"
@@ -30,6 +31,7 @@ module "eks" {
       additional_userdata           = "Worker node 2"
       additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
       asg_desired_capacity          = local.work_node2_size
+      suspended_processes           = ["AZRebalance","Launch","Terminated"]
     },
   ]
 }
