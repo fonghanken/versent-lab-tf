@@ -29,6 +29,8 @@ terraform {
 
   backend "s3" {
     bucket         = "versent-lab-tfstate"
+    #eks_eks-qX8jjaoB
+    #${variable.cluster_name.toreplace}
     key            = "terraform_${variable.cluster_name.toreplace}/terraform.tfstate"
     region         = "ap-southeast-1"
     dynamodb_table = "versent-lab-tflocks"

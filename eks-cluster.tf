@@ -33,7 +33,7 @@ module "eks" {
         role        = "infra"
       }
       launch_template_id  = aws_launch_template.infra.id
-      worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
+      #worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
     },
     worker = {
       desired_capacity = local.work_node_size
@@ -49,7 +49,7 @@ module "eks" {
         role        = "worker"
       }
       launch_template_id  = aws_launch_template.worker.id
-      worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
+      #worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
     }
   }
 }

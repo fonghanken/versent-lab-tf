@@ -33,6 +33,11 @@ output "cluster_name" {
   value       = local.cluster_name
 }
 
+output "eks_nodegroup" {
+  description = "Kubernetes Node Group Name"
+  value       = module.eks.node_groups
+}
+
 output "subnet_cidr_blocks" {
   value = [for s in data.aws_subnet.example : s.cidr_block]
 }
