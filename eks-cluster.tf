@@ -33,6 +33,8 @@ module "eks" {
         role        = "infra"
       }
       launch_template_id  = aws_launch_template.infra.id
+      create_launch_template = false
+      launch_template_version = 1
       #worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
     },
     worker = {
@@ -49,6 +51,8 @@ module "eks" {
         role        = "worker"
       }
       launch_template_id  = aws_launch_template.worker.id
+      create_launch_template = false
+      launch_template_version = 1
       #worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
     }
   }

@@ -41,7 +41,7 @@ data "aws_subnet_ids" "private" {
   }
 }
 
-data "aws_subnet" "example" {
+data "aws_subnet" "private" {
   for_each = data.aws_subnet_ids.private.ids
   id       = each.value
 }
