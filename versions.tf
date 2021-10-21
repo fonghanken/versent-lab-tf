@@ -25,7 +25,14 @@ terraform {
       version = ">= 2.0.1"
     }
   }
-
   required_version = "> 0.14"
+
+  backend "s3" {
+    bucket         = "versent-lab-tfstate"
+    key            = "terraform_${variable.cluster_name.toreplace}/terraform.tfstate"
+    region         = "ap-southeast-1"
+    dynamodb_table = "versent-lab-tflocks"
+    encrypt        = true
+  }
 }
 

@@ -12,39 +12,6 @@ module "eks" {
 
   vpc_id = data.aws_vpc.versent_lab.id
 
-  # workers_group_defaults = {
-  #   root_volume_type = "gp2"
-  # }
-
-  # worker_groups = [
-  #   {
-  #     name                          = "infra-node-1"
-  #     instance_type                 = "t2.small"
-  #     additional_userdata           = "Infra Node 1"
-  #     asg_desired_capacity          = local.infra_node_size
-  #     additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
-  #     #suspended_processes           = ["AZRebalance","Launch","Terminated"]
-  #     tags = [{
-  #       key                 = "node.kubernetes.io/role=infra"
-  #       value               = "owned"
-  #       propagate_at_launch = true
-  #     }]
-  #   },
-  #   {
-  #     name                          = "worker-node-2"
-  #     instance_type                 = "t2.small"
-  #     additional_userdata           = "Worker node 2"
-  #     additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
-  #     asg_desired_capacity          = local.work_node_size
-  #     #suspended_processes           = ["AZRebalance","Launch","Terminated"]
-  #     tags = [{
-  #       key                 = "node.kubernetes.io/role=worker"
-  #       value               = "true"
-  #       propagate_at_launch = true
-  #     }]
-  #   },
-  # ]
-
   #Managed Node Groups
   node_groups_defaults = {
     #ami_type  = "AL2_x86_64"
