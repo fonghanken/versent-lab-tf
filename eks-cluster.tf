@@ -5,9 +5,7 @@ module "eks" {
   subnets         = data.aws_subnet_ids.private.ids
 
   tags = {
-    Environment = "training"
-    GithubRepo  = "terraform-aws-eks"
-    GithubOrg   = "terraform-aws-modules"
+    Environment = "lab"
   }
 
   vpc_id = data.aws_vpc.versent_lab.id
@@ -21,21 +19,18 @@ module "eks" {
   node_groups = {
     infra = {
       desired_capacity = local.infra_node_size
-      max_capacity     = 3
+      max_capacity     = 2
       min_capacity     = 1
 
       instance_types = ["t2.small"]
       capacity_type  = "ON_DEMAND"
       k8s_labels = {
-        Environment = "testing"
-        GithubRepo  = "terraform-aws-eks"
-        GithubOrg   = "terraform-aws-modules"
+        Environment = "lab"
         role        = "infra"
       }
-      launch_template_id  = aws_launch_template.infra.id
+      launch_template_id  = aws_launch_template.eks.id
       create_launch_template = false
       launch_template_version = 1
-      #worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
     },
     worker = {
       desired_capacity = local.work_node_size
@@ -45,42 +40,39 @@ module "eks" {
       instance_types = ["t2.small"]
       capacity_type  = "ON_DEMAND"
       k8s_labels = {
-        Environment = "testing"
-        GithubRepo  = "terraform-aws-eks"
-        GithubOrg   = "terraform-aws-modules"
+        Environment = "lab"
         role        = "worker"
       }
-      launch_template_id  = aws_launch_template.worker.id
+      launch_template_id  = aws_launch_template.eks.id
       create_launch_template = false
       launch_template_version = 1
-      #worker_additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
     }
   }
 }
 
-resource "aws_launch_template" "infra" {
-  name                          = "${local.cluster_name}-infra_launch_template"
+resource "aws_launch_template" "eks" {
+  name                          = "${local.cluster_name}-eks_launch_template"
   update_default_version        = false
 
   tag_specifications {
     resource_type               = "instance"
     tags = {
-      Name                      = "${local.cluster_name}-infra"
+      Name                      = "${local.cluster_name}"
     }   
   }
 }
 
-resource "aws_launch_template" "worker" {
-  name                          = "${local.cluster_name}-worker_launch_template"
-  update_default_version        = false
+# resource "aws_launch_template" "worker" {
+#   name                          = "${local.cluster_name}-worker_launch_template"
+#   update_default_version        = false
 
-  tag_specifications {
-    resource_type               = "instance"
-    tags = {
-      Name                      = "${local.cluster_name}-worker"
-    }   
-  }
-}
+#   tag_specifications {
+#     resource_type               = "instance"
+#     tags = {
+#       Name                      = "${local.cluster_name}-worker"
+#     }   
+#   }
+# }
 
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_id
